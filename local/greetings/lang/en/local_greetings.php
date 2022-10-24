@@ -45,3 +45,5 @@ $string['greetings:deleteanymessage'] = 'Delete any message on the Greetings wal
 
 $string['showinnavigation'] = 'Show in navigation';
 $string['showinnavigationdesc'] = 'When enabled will show link in navigation';
+
+$string['delete'] = 'Delete';

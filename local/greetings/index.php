@@ -42,6 +42,9 @@ $allowpost = has_capability('local/greetings:postmessages', $context);
 $allowread = has_capability('local/greetings:viewmessages', $context);
 $deletepost = has_capability('local/greetings:deleteownmessage', $context);
 $deleteanypost = has_capability('local/greetings:deleteanymessage', $context);
+$editpost = has_capability('local/greetings:editownmessage', $context);
+$editanypost = has_capability('local/greetings:editanymessage', $context);
+
 $action = optional_param('action', '', PARAM_TEXT);
 
 if ($action == 'del') {
@@ -56,6 +59,20 @@ if ($action == 'del') {
 }
 
 $messageform = new local_greetings_message_form();
+
+
+if ($action == 'edit'){
+    require_sesskey();
+    $id = required_param('id', PARAM_TEXT);
+    $userid = required_param('usrid', PARAM_TEXT);
+    if ($editanypost || $editpost){
+        $dataobject->id = $id;
+        $dataobject->userid = $USER->id;
+        $dataobject->timecreated = time();
+        $dataobject->message = 'this has been updated successfully';
+        $DB -> update_record('local_greetings_messages', $dataobject, $bulk=false);
+    }
+}
 if ($data = $messageform->get_data()) {
     require_capability('local/greetings:postmessages', $context);
     require_sesskey();
@@ -101,6 +118,18 @@ if ($allowread){
         echo html_writer::start_tag('p', array('class' => 'card-text'));
         echo html_writer::tag('small', userdate($m->timecreated), array('class' => 'text-muted'));
         echo html_writer::end_tag('p');
+        if ($editanypost || ($editpost && $m->userid == $USER->id)){
+            echo html_writer::start_tag('p', array('class' => 'card-footer text-center'));
+            echo html_writer::link(
+                new moodle_url(
+                    '/local/greetings/index.php',
+                    array('action' => 'edit', 'id' => $m->id, 'usrid' => $m->userid, 'sesskey' => sesskey())
+                ),
+                $OUTPUT->pix_icon('t/edit', '') ,
+                array('role' => 'button', 'aria-label' => get_string('edit'), 'title' => get_string('edit'))
+            );
+            echo html_writer::end_tag('p');
+        }        
         if ($deleteanypost || ($deletepost && $m->userid == $USER->id)) {
             echo html_writer::start_tag('p', array('class' => 'card-footer text-center'));
             echo html_writer::link(
@@ -108,7 +137,8 @@ if ($allowread){
                     '/local/greetings/index.php',
                     array('action' => 'del', 'id' => $m->id,'sesskey' => sesskey())
                 ),
-                $OUTPUT->pix_icon('t/delete', '') . get_string('delete')
+                $OUTPUT->pix_icon('t/delete', '') ,
+                array('role' => 'button', 'aria-label' => get_string('delete'), 'title' => get_string('delete'))
             );
             echo html_writer::end_tag('p');
         }

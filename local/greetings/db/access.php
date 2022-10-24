@@ -54,4 +54,19 @@ $capabilities = array(
             'user' => CAP_ALLOW,
         )
     ),
+    'local/greetings:editownmessage' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'user' => CAP_ALLOW,
+        )
+    ),
+    'local/greetings:editanymessage' => array(
+        'riskbitmask' => RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'user' => CAP_ALLOW,
+        )
+    ),
 );
